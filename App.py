@@ -23,14 +23,26 @@ def preprocess_input(spec, gender, branch):
     return spec_map[spec], gender_map[gender], branch_map[branch]
 
 
-def predict_gpa(spec, gender, st_hr, school_av, branch, level, age):
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+import joblib
+import numpy as np
+
+def predict_gpa(model_file, spec, gender, st_hr, school_av, branch, level, age):
     spec, gender, branch = preprocess_input(spec, gender, branch)
 
-    with open('gpa_model_1.pkl', 'rb') as file:
+    with open(model_file, 'rb') as file:
         model = joblib.load(file)
 
     input_data = np.array([[spec, gender, st_hr, school_av, branch, level, age]])
+
+    if model_file == 'gpa_model_2.pkl':
+        poly = joblib.load('poly_transform.pkl')
+        scaler = joblib.load('scaler.pkl')
+
+        input_data = poly.transform(input_data)
+        input_data = scaler.transform(input_data)
 
     gpa_prediction = model.predict(input_data)
 
@@ -40,8 +52,12 @@ def predict_gpa(spec, gender, st_hr, school_av, branch, level, age):
 def convert_to_4_scale(gpa):
     return (gpa / 100) * 4
 
-if st.button("Predict GPA"):
-    gpa = predict_gpa(spec, gender, st_hr, school_av, branch, level, age)
-    st.success(f"Predicted GPA: {gpa}")
+if st.button("Predict GPA with Model 1"):
+    gpa = predict_gpa('gpa_model_1.pkl', spec, gender, st_hr, school_av, branch, level, age)
     gpa_4_scale = convert_to_4_scale(gpa)
-    st.success(f"Predicted GPA: {gpa:.2f} (Raw), {gpa_4_scale:.2f} (0-4 Scale)")
+    st.success(f"Predicted GPA (Model 1): {gpa:.2f} (Raw), {gpa_4_scale:.2f} (0-4 Scale)")
+
+if st.button("Predict GPA with Model 2"):
+    gpa = predict_gpa('gpa_model_2.pkl', spec, gender, st_hr, school_av, branch, level, age)
+    gpa_4_scale = convert_to_4_scale(gpa)
+    st.success(f"Predicted GPA (Model 2): {gpa:.2f} (Raw), {gpa_4_scale:.2f} (0-4 Scale)")
