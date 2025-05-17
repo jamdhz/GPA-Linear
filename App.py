@@ -24,8 +24,6 @@ def preprocess_input(spec, gender, branch):
 
 
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 import joblib
 import numpy as np
 
