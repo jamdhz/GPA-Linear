@@ -46,6 +46,18 @@ def predict_gpa(model_file, spec, gender, st_hr, school_av, branch, level, age):
 
     return gpa_prediction[0]
 
+def predict_gpa_best(model_file, gender, st_hr, school_av, branch):
+    gender_map = {"F": 0, "M": 1}
+    branch_map = {"P": 0, "A": 1}
+    gender = gender_map[gender]
+    branch = branch_map[branch]
+    input_data = np.array([[branch, school_av, gender, st_hr]])
+
+    scaler = joblib.load('scaler_best.pkl')
+    model = joblib.load(model_file)
+    input_data = scaler.transform(input_data)
+    gpa_prediction = model.predict(input_data)
+    return gpa_prediction[0]
 
 def convert_to_4_scale(gpa):
     return (gpa / 100) * 4
@@ -59,3 +71,8 @@ if st.button("Predict GPA with Model 2"):
     gpa = predict_gpa('gpa_model_2.pkl', spec, gender, st_hr, school_av, branch, level, age)
     gpa_4_scale = convert_to_4_scale(gpa)
     st.success(f"Predicted GPA (Model 2): {gpa:.2f} (Raw), {gpa_4_scale:.2f} (0-4 Scale)")
+
+if st.button("Predict GPA with Best Model"):
+    gpa = predict_gpa_best('best_model.pkl', gender, st_hr, school_av, branch)
+    gpa_4_scale = convert_to_4_scale(gpa)
+    st.success(f"Predicted GPA (Best Model): {gpa:.2f} (Raw), {gpa_4_scale:.2f} (0-4 Scale)")
