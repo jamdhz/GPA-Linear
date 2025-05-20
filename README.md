@@ -43,3 +43,7 @@ Model 4: Linear Regression (Selected Features)
 Mean squared error: 12.53811223922532
 R^2 score: 0.7202961793263445
 Rank: 3
+
+## Link demo app
+
+[Demo App](https://kelompok5gpapred.streamlit.app/)
